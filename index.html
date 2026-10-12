@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSCM Cylinder Explorer</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-basic-dist-min@2.35.2/plotly-basic.min.js"></script>
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+<header>
+  <h1>CSCM Cylinder Explorer</h1>
+  <p class="sub">One-at-a-time sensitivity of <code>*MAT_CSCM_CONCRETE</code> in a 100&times;200 mm cylinder under
+  uniaxial compression (LS-DYNA, quarter model, <i>h</i>&nbsp;=&nbsp;5&nbsp;mm). Pick a constant, drag its slider, and
+  compare the load history and the damage with the default card and the tests.</p>
+</header>
+
+<main>
+  <section id="params" aria-label="Parameters">
+    <div class="ptools">
+      <label>bar shows
+        <select id="barMetric">
+          <option value="rmse_aligned">change in post-peak RMSE</option>
+          <option value="peak">change in peak force</option>
+        </select>
+      </label>
+      <button id="reset" type="button">reset to default</button>
+    </div>
+    <p class="hint">One at a time: moving a slider returns every other constant to its default.</p>
+    <div id="plist"></div>
+  </section>
+
+  <section id="results">
+    <div class="card">
+      <div class="cardhead">
+        <h2 id="caseTitle">default card</h2>
+        <div class="seg" role="group" aria-label="x axis">
+          <button data-x="t" class="on" type="button">time</button>
+          <button data-x="d" type="button">stroke</button>
+        </div>
+      </div>
+      <div id="plot"></div>
+      <div id="metrics"></div>
+    </div>
+
+    <div class="card">
+      <div class="cardhead">
+        <h2>Damage</h2>
+        <div class="vtools">
+          <div class="seg" role="group" aria-label="model view">
+            <button data-view="quarter" class="on" type="button">quarter</button>
+            <button data-view="full" type="button">full (mirrored)</button>
+          </div>
+          <label><input type="checkbox" id="showPlates"> platens</label>
+          <label>colors
+            <select id="cmap"><option value="gray">gray (paper)</option><option value="heat">heat</option></select>
+          </label>
+        </div>
+      </div>
+      <div id="viewer">
+        <canvas id="gl"></canvas>
+        <span class="vlabel left">default</span>
+        <span class="vlabel right" id="vlabelRight">selected</span>
+        <div id="cbar"><span>0</span><i></i><span>1</span><em>damage</em></div>
+      </div>
+      <div class="timebar">
+        <button id="play" type="button" aria-label="play">&#9654;</button>
+        <input type="range" id="state" min="0" max="31" value="10" step="1" aria-label="time step">
+        <span id="stateLabel"></span>
+      </div>
+      <p class="hint">Drag to rotate, scroll to zoom. Eroded elements are removed. Displacements are not magnified.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>Data: LS-DYNA R14 SMP, MAT_159 (CSCM) generated from <i>f</i><sub>c</sub>&prime; = 31.2 MPa, <i>d</i><sub>agg</sub> = 19 mm;
+  loading platen at 10 mm/s; tests T1&ndash;T3 toe-corrected, stroke as measured. Force is for the full specimen.</p>
+</footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
