@@ -19,6 +19,8 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 import cscm, post
 from run_queue import status
+sys.path.insert(0, os.path.join(ROOT, "studies"))
+from s100_oat import GRID          # three steps each side of the default; other levels are not shown
 
 RUNS = os.path.join(ROOT, "runs", "110_oat_cons")
 WEB = os.path.join(ROOT, "web", "data")
@@ -189,6 +191,8 @@ def main(force=False):
         p = "base" if n == "base" else param_of(n)
         if p != "base" and p not in PARAMS:
             print("skip (unknown parameter)", n); continue
+        if p in GRID and n not in GRID[p]:
+            continue                                   # off-grid level (earlier designs)
         r = os.path.join(c, "response.csv")
         if not os.path.exists(r) or os.path.getmtime(r) < os.path.getmtime(os.path.join(c, "messag")):
             post.case_response(c)
@@ -223,6 +227,9 @@ def main(force=False):
     meta = dict(geom=geom, params=out_params, cases=cases, tests=tests, rate_mm_per_s=10.0,
                 note="OAT around the MAT_CSCM_CONCRETE defaults (fc' 31.2 MPa, dagg 19 mm), quarter model, h = 5 mm")
     json.dump(meta, open(os.path.join(WEB, "cases.json"), "w"), separators=(",", ":"))
+    for f in os.listdir(os.path.join(WEB, "dmg")):              # drop damage files of levels no longer shown
+        if f[:-4] not in cases:
+            os.remove(os.path.join(WEB, "dmg", f))
     print(f"{len(cases)} cases, {len(out_params)} parameters ->", WEB)
 
 
